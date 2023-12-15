@@ -1,7 +1,9 @@
 from collections import namedtuple
 
-import tensorflow as tf
-import tensorflow.contrib.distributions as tfd
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import tensorflow_probability as tfp
+tfd = tfp.distributions
 import numpy as np
 
 from tf_utils import dense_layer, shape
@@ -77,7 +79,7 @@ class LSTMAttentionCell(tf.nn.rnn_cell.RNNCell):
 
             # lstm 1
             s1_in = tf.concat([state.w, inputs], axis=1)
-            cell1 = tf.contrib.rnn.LSTMCell(self.lstm_size)
+            cell1 = tf.compat.v1.nn.rnn_cell.LSTMCell(self.lstm_size)
             s1_out, s1_state = cell1(s1_in, state=(state.c1, state.h1))
 
             # attention
@@ -101,12 +103,12 @@ class LSTMAttentionCell(tf.nn.rnn_cell.RNNCell):
 
             # lstm 2
             s2_in = tf.concat([inputs, s1_out, w], axis=1)
-            cell2 = tf.contrib.rnn.LSTMCell(self.lstm_size)
+            cell2 = tf.compat.v1.nn.rnn_cell.LSTMCell(self.lstm_size)
             s2_out, s2_state = cell2(s2_in, state=(state.c2, state.h2))
 
             # lstm 3
             s3_in = tf.concat([inputs, s2_out, w], axis=1)
-            cell3 = tf.contrib.rnn.LSTMCell(self.lstm_size)
+            cell3 = tf.compat.v1.nn.rnn_cell.LSTMCell(self.lstm_size)
             s3_out, s3_state = cell3(s3_in, state=(state.c3, state.h3))
 
             new_state = LSTMAttentionCellState(
@@ -155,7 +157,7 @@ class LSTMAttentionCell(tf.nn.rnn_cell.RNNCell):
         past_final_char = char_idx >= self.attention_values_lengths
         output = self.output_function(state)
         es = tf.cast(output[:, 2], tf.int32)
-        is_eos = tf.equal(es, np.ones_like(es))
+        is_eos = tf.equal(es, tf.ones_like(es))
         return tf.logical_or(tf.logical_and(final_char, is_eos), past_final_char)
 
     def _parse_parameters(self, gmm_params, eps=1e-8, sigma_eps=1e-4):

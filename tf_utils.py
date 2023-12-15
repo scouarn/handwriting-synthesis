@@ -1,4 +1,5 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 
 def dense_layer(inputs, output_units, bias=True, activation=None, batch_norm=None,
@@ -17,7 +18,7 @@ def dense_layer(inputs, output_units, bias=True, activation=None, batch_norm=Non
     with tf.variable_scope(scope, reuse=reuse):
         W = tf.get_variable(
             name='weights',
-            initializer=tf.contrib.layers.variance_scaling_initializer(),
+            initializer=tf.compat.v1.variance_scaling_initializer(),
             shape=[shape(inputs, -1), output_units]
         )
         z = tf.matmul(inputs, W)
@@ -57,7 +58,7 @@ def time_distributed_dense_layer(
     with tf.variable_scope(scope, reuse=reuse):
         W = tf.get_variable(
             name='weights',
-            initializer=tf.contrib.layers.variance_scaling_initializer(),
+            initializer=tf.compat.v1.variance_scaling_initializer(),
             shape=[shape(inputs, -1), output_units]
         )
         z = tf.einsum('ijk,kl->ijl', inputs, W)

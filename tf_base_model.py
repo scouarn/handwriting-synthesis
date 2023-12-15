@@ -7,7 +7,8 @@ import pprint as pp
 import time
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 from tf_utils import shape
 
