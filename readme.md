@@ -2,7 +2,14 @@
 # Handwriting Synthesis
 Implementation of the handwriting synthesis experiments in the paper <a href="https://arxiv.org/abs/1308.0850">Generating Sequences with Recurrent Neural Networks</a> by Alex Graves.  The implementation closely follows the original paper, with a few slight deviations, and the generated samples are of similar quality to those presented in the paper.
 
-Web demo is available <a href="https://seanvasquez.com/handwriting-generation/">here</a>.
+Web demo from original github (which I forked) is available <a href="https://seanvasquez.com/handwriting-generation/">here</a>.
+
+## Fork Notes
+Fork has the following changes from the original
+1. Updated to work with TensorFlow 2.15.0 (current as of December 2023), but uses the v1 compat mechanism.  Honestly I hacked and burned through many errors in an hour and a half (I forked at 7:05 PM and am writing this at 8:35 PM) and just verified by running the demo.py and looking through the output image files.  It didn't create a banner.svg file (no idea if it was supposed to), and it gets a lot of deprecation warnings so use at your own risk.  TensorFlow will likely abandon some of this V1 compat stuff in the relatively near future, but this should work as long as you can still get 2.15.0 for whatever python version you have.
+2. I'm going to split the Hand class into its own file (per the original author's suggestion).
+3. I left everything else below this text alone (except striking the "split Hand class" request).
+4. If you think my fork is super sloppy (you're right) and want to do it right- the major job is to convert the deprecated `tf.nn.rnn_cell.LSTMCell` and replace it with `tf.keras.layers.LSTMCell`.  It is not a drop in replacement.  Have at it.
 
 ## Usage
 ```python
@@ -29,7 +36,7 @@ hand.write(
 ```
 ![](img/usage_demo.svg)
 
-Currently, the `Hand` class must be imported from `demo.py`.  If someone would like to package this project to make it more usable, please [contribute](#contribute).
+~~Currently, the `Hand` class must be imported from `demo.py`.  If someone would like to package this project to make it more usable, please [contribute](#contribute).~~
 
 A pretrained model is included, but if you'd like to train your own, read <a href='https://github.com/sjvasquez/handwriting-synthesis/tree/master/data/raw'>these instructions</a>.
 
