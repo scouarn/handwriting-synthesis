@@ -215,9 +215,43 @@ ad = axidraw.AxiDraw()
 def normalize(text):
     text = unicodedata.normalize("NFKD", text)
     text = "".join(c for c in text if c in alphabet + ["\n"])
-    lines = text.split("\n")
-    lines = [ l[:75] for l in lines ] # FIXME: don't trim
-    return lines
+    return text
+
+def format_card(text, maxlen=60):
+    in_lines  = text.split("\n")
+    out_lines = []
+
+    while len(in_lines) > 0:
+        l = in_lines.pop(0)
+
+        if len(l) <= maxlen:
+            out_lines.append(l)
+            continue
+
+        while len(l) > maxlen:
+            # Split on space if possible
+            split = maxlen
+            while split >= 0 and l[split] != " ":
+                split -= 1
+
+            # Break at maxlen if not possible
+            if split <= 0:
+                split = maxlen
+                remain = l[split:]
+            else:
+                remain = l[split+1:] # Don't include the space
+
+            out_lines.append(l[:split])
+
+            # Overflow if the next line is larger than maxlen or if the current line doesn't end with punctuation
+            if len(in_lines) > 0 and (len(in_lines[0]) > maxlen or l[-1] not in ",.!?"):
+                remain += " " + in_lines.pop(0)
+
+            l = remain
+
+        out_lines.append(l)
+
+    return out_lines
 
 
 # Entrypoint(s) ################################################################
@@ -237,7 +271,7 @@ def main():
     print(f"ID: {base_name}")
 
     #text = generate_text()
-    text = random.choice([c for c in CARD_DATA])
+    text = random.choice([c for c in CARD_DATA if c.count("\n") > 5])
 
     print("-- TEXT --")
     print(text)
@@ -245,11 +279,15 @@ def main():
     with open(base_path + ".txt", "w") as f:
         f.write(text)
 
-    lines = normalize(text)
+    text = normalize(text)
+    lines = format_card(text)
+
+    print("-- FORMAT --")
+    print("\n".join(lines))
+    print("------------")
+
     styles = [ args.style for _ in lines ]
     biases = [ args.bias  for _ in lines ]
-
-    print(lines)
 
     handwriting_model.write(
         filename=base_path+".svg",
