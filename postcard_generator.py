@@ -296,8 +296,8 @@ def main():
         styles=styles,
     )
 
-    #ad.plot_setup(base_path + ".svg")
-    #ad.plot_run()
+    ad.plot_setup(base_path + ".svg")
+    ad.plot_run()
 
 if __name__ == "__main__" :
     main()
