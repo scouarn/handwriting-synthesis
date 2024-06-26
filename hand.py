@@ -113,38 +113,41 @@ class Hand(object):
         stroke_widths = stroke_widths or [2]*len(lines)
 
         line_height = 60
-        view_width = 1000
-        view_height = line_height*(len(strokes) + 1)
+        real_width  = 148
+        real_height = 105
+        dwg = svgwrite.Drawing(filename=filename, size=(f"{real_width}mm", f"{real_height}mm"))
+        y_offset = 0
 
-        dwg = svgwrite.Drawing(filename=filename)
-        dwg.viewbox(width=view_width, height=view_height)
-        dwg.add(dwg.rect(insert=(0, 0), size=(view_width, view_height), fill='white'))
-
-        initial_coord = np.array([0, -(3*line_height / 4)])
         for offsets, line, color, width in zip(strokes, lines, stroke_colors, stroke_widths):
-
             if not line:
-                initial_coord[1] -= line_height
                 continue
 
             offsets[:, :2] *= 1.5
             strokes = drawing.offsets_to_coords(offsets)
+
             strokes = drawing.denoise(strokes)
             strokes[:, :2] = drawing.align(strokes[:, :2])
-
-            strokes[:, 1] *= -1
-            strokes[:, :2] -= strokes[:, :2].min() + initial_coord
-            strokes[:, 0] += (view_width - strokes[:, 0].max()) / 2
+            strokes[:, 1]  *= -1
+            strokes[:, :2] -= strokes[:, :2].min(axis=0)
+            strokes[:, 1]  += y_offset
 
             prev_eos = 1.0
             p = "M{},{} ".format(0, 0)
             for x, y, eos in zip(*strokes.T):
                 p += '{}{},{} '.format('M' if prev_eos == 1.0 else 'L', x, y)
                 prev_eos = eos
+
             path = svgwrite.path.Path(p)
             path = path.stroke(color=color, width=width, linecap='round').fill("none")
             dwg.add(path)
 
-            initial_coord[1] -= line_height
+            y_offset += line_height
 
+        view_width  = 1000
+        scale = view_width / real_width
+        view_height = real_height * scale
+        real_margin = 10
+        miny = minx = -1 * real_margin * scale
+
+        dwg.viewbox(minx, miny, view_width, view_height)
         dwg.save()
