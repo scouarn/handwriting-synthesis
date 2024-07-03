@@ -5,6 +5,7 @@ import json
 import os
 import random
 import re
+import subprocess
 import sys
 import time
 import unicodedata
@@ -187,22 +188,10 @@ def extract_sentiments(text: str) :
 
 
 # Generate markup for TTS
-def generate_ssml(sentiments) -> str :
+def generate_ssml(text) -> str :
     ssml  = "<?xml version='1.0'?>\n"
     ssml += "<speak>\n"
-
-    for s in sentiments :
-        sent = s['labels'][0]
-        pre, post = config.SENT_TAGS[sent]
-
-        inner = html.escape(s['sequence'])
-
-        # Fix pronunciation of Royan
-        # TODO: escape IPA chars ?
-        inner = inner.replace("Royan", "<phoneme alphabet='ipa' ph='ʁwajɑ̃'>Royan</phoneme>")
-
-        ssml += f"  {pre}{inner}{post}\n"
-
+    ssml += text.replace("Royan", "<phoneme alphabet='ipa' ph='ʁwajɑ̃'>Royan</phoneme>")
     ssml += "</speak>"
     return ssml
 
@@ -269,26 +258,47 @@ def main():
     base_path = os.path.join(args.output_dir, base_name)
 
     print(f"ID: {base_name}")
+    print(f"Generating text...")
 
-    text = generate_text()
-    #text = random.choice([c for c in CARD_DATA if c.count("\n") > 5])
+    #text = generate_text()
+    text = random.choice([c for c in CARD_DATA if c.count("\n") > 5])
 
     print("-- TEXT --")
     print(text)
-    print("----------")
     with open(base_path + ".txt", "w") as f:
         f.write(text)
 
-    text = normalize(text)
-    lines = format_card(text)
+    lines = format_card(normalize(text))
 
     print("-- FORMAT --")
     print("\n".join(lines))
-    print("------------")
+    print("----------")
+    input("Proceed? ")
 
+
+    ssml = generate_ssml(text)
+    print("-- SSML --")
+    print(ssml)
+    with open(base_path + ".ssml", "w") as f:
+        f.write(ssml)
+
+    print("Generating audio...")
+    subprocess.run([
+        "cerevoice/txt2wav", "cerevoice/voice.voice", "cerevoice/license.lic",
+        "-", "-", "-",
+        base_path + ".ssml", base_path + ".wav"
+    ])
+
+    print("Playing audio...")
+    subprocess.run([
+        "mpv", base_path + ".wav"
+    ])
+
+
+
+    print(f"Generating handwriting...")
     styles = [ args.style for _ in lines ]
     biases = [ args.bias  for _ in lines ]
-
     handwriting_model.write(
         filename=base_path+".svg",
         lines=lines,
@@ -296,9 +306,14 @@ def main():
         styles=styles,
     )
 
+    print(f"Plotting...")
     ad.plot_setup(base_path + ".svg")
     ad.plot_run()
 
+
+    input(f"Continue? ")
+
 if __name__ == "__main__" :
-    main()
+    while True:
+        main()
 

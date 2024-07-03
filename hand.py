@@ -118,6 +118,24 @@ class Hand(object):
         dwg = svgwrite.Drawing(filename=filename, size=(f"{real_width}mm", f"{real_height}mm"))
         y_offset = 0
 
+        view_width  = 1000
+        scale = view_width / real_width
+        view_height = real_height * scale
+        real_margin = 10
+        view_margin = real_margin * scale
+        miny = minx = -view_margin
+
+        dwg.viewbox(minx, miny, view_width+view_margin, view_height+view_margin)
+
+        w = 10 * scale
+        h = 15 * scale
+        dwg.add(dwg.rect(insert=(view_width-w-view_margin, 0), size=(w, h), stroke="black", fill="none"))
+
+        x = 3/4*view_width
+        dwg.add(dwg.line(start=(x, 0), end=(x, view_height-view_margin), stroke="black", fill="none"))
+
+        #dwg.add()
+
         for offsets, line, color, width in zip(strokes, lines, stroke_colors, stroke_widths):
             if not line:
                 continue
@@ -143,11 +161,4 @@ class Hand(object):
 
             y_offset += line_height
 
-        view_width  = 1000
-        scale = view_width / real_width
-        view_height = real_height * scale
-        real_margin = 10
-        miny = minx = -1 * real_margin * scale
-
-        dwg.viewbox(minx, miny, view_width, view_height)
         dwg.save()
