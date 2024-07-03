@@ -217,7 +217,7 @@ def normalize(text):
     text = "".join(c for c in text if c in alphabet + ["\n"])
     return text
 
-def format_card(text, maxlen=60):
+def format_card(text, maxlen=55):
     in_lines  = text.split("\n")
     out_lines = []
 
@@ -270,8 +270,8 @@ def main():
 
     print(f"ID: {base_name}")
 
-    #text = generate_text()
-    text = random.choice([c for c in CARD_DATA if c.count("\n") > 5])
+    text = generate_text()
+    #text = random.choice([c for c in CARD_DATA if c.count("\n") > 5])
 
     print("-- TEXT --")
     print(text)
