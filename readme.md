@@ -1,3 +1,23 @@
+
+# Fork notes
+
+This is a fork of a fork of a handwriting synthesiser combined with a [postcard text generator](https://gitlab.com/scouarn/postcard_generator).
+
+Requirements:
+
+- Python between 3.7 and 3.9 (I recommand using a [venv](https://docs.python.org/3/library/venv.html))
+- A HuggingFace token in the `HF_TOKEN` env variable.
+- `cerevoice/txt2wav` (from `cerevoice_sdk_.../examples/basictts/txt2wav`)
+- `cerevoice/voice.voice` and `cerevoice/license.lic`
+
+
+Usage:
+
+```shell
+$ python postcard_generator.py
+```
+
+
 ![](img/banner.svg)
 # Handwriting Synthesis
 Implementation of the handwriting synthesis experiments in the paper <a href="https://arxiv.org/abs/1308.0850">Generating Sequences with Recurrent Neural Networks</a> by Alex Graves.  The implementation closely follows the original paper, with a few slight deviations, and the generated samples are of similar quality to those presented in the paper.
