@@ -5,7 +5,7 @@ This is a fork of a fork of a handwriting synthesiser combined with a [postcard 
 
 Requirements:
 
-- Python between 3.7 and 3.9 (I recommand using a [venv](https://docs.python.org/3/library/venv.html))
+- Python between 3.7 and 3.9 (I recommend using a [venv](https://docs.python.org/3/library/venv.html))
 - A HuggingFace token in the `HF_TOKEN` env variable.
 - `cerevoice/txt2wav` (from `cerevoice_sdk_.../examples/basictts/txt2wav`)
 - `cerevoice/voice.voice` and `cerevoice/license.lic`
