@@ -248,7 +248,7 @@ def format_card(text, maxlen=55):
 parser = argparse.ArgumentParser(prog="Postcard Generator")
 parser.add_argument("--output-dir", default="postcards")
 parser.add_argument("--style", default=9, type=int)
-parser.add_argument("--bias", default=10, type=float)
+parser.add_argument("--bias", default=1, type=float)
 
 
 def main():
@@ -260,41 +260,38 @@ def main():
     print(f"ID: {base_name}")
     print(f"Generating text...")
 
-    #text = generate_text()
-    text = random.choice([c for c in CARD_DATA if c.count("\n") > 5])
+    text = generate_text()
+    #text = random.choice([c for c in CARD_DATA if c.count("\n") > 5])
+    #text = text.replace("Royan", "La Rochelle")
 
     print("-- TEXT --")
     print(text)
+    print("----------")
+    if input("Proceed (Y/n) ? ") == 'n':
+        return
+
     with open(base_path + ".txt", "w") as f:
         f.write(text)
 
-    lines = format_card(normalize(text))
-
-    print("-- FORMAT --")
-    print("\n".join(lines))
-    print("----------")
-    input("Proceed? ")
-
-
     ssml = generate_ssml(text)
-    print("-- SSML --")
-    print(ssml)
     with open(base_path + ".ssml", "w") as f:
         f.write(ssml)
 
+    lines = format_card(normalize(text))
+
+    print("-- SSML --")
+    print(ssml)
+    print("-- FORMAT --")
+    print("\n".join(lines))
+    print("----------")
+
+
     print("Generating audio...")
-    subprocess.run([
+    p_txt2wav = subprocess.Popen([
         "cerevoice/txt2wav", "cerevoice/voice.voice", "cerevoice/license.lic",
         "-", "-", "-",
         base_path + ".ssml", base_path + ".wav"
     ])
-
-    print("Playing audio...")
-    subprocess.run([
-        "mpv", base_path + ".wav"
-    ])
-
-
 
     print(f"Generating handwriting...")
     styles = [ args.style for _ in lines ]
@@ -306,10 +303,18 @@ def main():
         styles=styles,
     )
 
+    p_txt2wav.wait()
+
+    print("Playing audio...")
+    p_mpv = subprocess.Popen([
+        "mpv", base_path + ".wav"
+    ])
+
     print(f"Plotting...")
     ad.plot_setup(base_path + ".svg")
     ad.plot_run()
 
+    p_mpv.wait()
 
     input(f"Continue? ")
 

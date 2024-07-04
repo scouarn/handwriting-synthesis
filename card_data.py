@@ -19,10 +19,10 @@ CARD_DATA = ['Chère amie,\n'
  "Ils repartent samedi matin. Nous profitons au maximum. C'est le repos "
  'complet.\n'
  'Je vous quitte en vous embrassant bien fort de loin. Jocelyne, Ludovic, '
- 'Franck.\n'
+ 'Franck.\n',
  'Salut Dédé,\n'
  'Je me fais bronzer Paupaul. Crois-moi, il est pas au chômage.',
- 'Village Joël, avenue de la Grande Conches, Royan, Charente inférieure.\n'
+ 'Village Joël, avenue de la Grande Conches, Royan, Charente inférieure.\n',
  'Samedi,\n'
  'Chers parents,\n'
  'Nous avons fait un très bon voyage, pas fatiguant du tout. Ma tante nous\n'
